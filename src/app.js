@@ -3,10 +3,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
+const cors = require('cors');
 
 const app = express();
-
 app.use(bodyParser.json());
+app.use(cors());
 app.use("/", routes);
 
 //Connect to DB
@@ -31,4 +32,4 @@ db.once("open", function () {
 //   console.log(result);
 // }
 
-app.listen(3000);
+app.listen(3001);

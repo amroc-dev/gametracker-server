@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const router = express.Router();
-const mongo = require('./Mongo');
+const mongo = require("./Mongo");
 
 router.post("/", async (req, res) => {
   const bodyObj = req.body;
@@ -14,24 +14,46 @@ router.post("/", async (req, res) => {
   const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
   const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
 
-  const searchTerm = bodyObj.searchTerm;
+  const searchTerm = bodyObj.searchTerm.toLowerCase();
 
   console.log("SearchTerm: " + searchTerm);
 
-  const regex = new RegExp(searchTerm, "i");
+  const searchTermRegex = new RegExp(searchTerm, "i");
+  // const query = {
+  //     trackName: { $regex: regex },
+  // };
   const query = {
-    trackName: { $regex: regex },
+    $or: [
+      { trackName: { $regex: searchTermRegex } },
+      { "searchBlob.sellerName": { $regex: searchTermRegex } },
+      { tags: { $elemMatch: { $eq: searchTerm } } },
+    ],
   };
 
   const options = {
-    limit : count,
-    skip : offset,
-  }
+    limit: count,
+    skip: offset,
+    sort: {
+      "lookupBlob.userRating.ratingCount": -1,
+      // "lookupBlob.userRating.value": -1,
+    },
+  };
 
   const cursor = await mongo.collection.find(query, options);
-  const results = []
-  await cursor.forEach( r => results.push(r));
-  res.send(results);
+  const results = [];
+  let resultsCount = 0;
+
+  if (offset == 0) {
+    resultsCount = await cursor.count();
+  }
+
+  await cursor.forEach((r) => results.push(r));
+  const returnBlob = {
+    resultsCount,
+    results,
+  }
+
+  res.send(returnBlob);
 });
 
 module.exports = router;

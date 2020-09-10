@@ -11,19 +11,14 @@ router.post("/", async (req, res) => {
     return;
   }
 
+  const searchTerm = bodyObj.searchTerm.toLowerCase();
+  console.log("SearchTerm: " + searchTerm);
   const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
   const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
-  const sortField = bodyObj.sortField == undefined ? "lookupBlob.userRating.ratingCount" : bodyObj.sortField;
-
-  const searchTerm = bodyObj.searchTerm.toLowerCase();
-
-  console.log("SearchTerm: " + searchTerm);
+  const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
 
   const searchTermRegex = new RegExp(searchTerm, "i");
-  // const query = {
-  //     trackName: { $regex: regex },
-  // };
-  const query = {
+  let query = {
     $or: [
       { trackName: { $regex: searchTermRegex } },
       { "searchBlob.sellerName": { $regex: searchTermRegex } },
@@ -31,16 +26,37 @@ router.post("/", async (req, res) => {
     ],
   };
 
+  let sortField = "lookupBlob.userRating.ratingCount";
+  switch (sortMethod.toLowerCase())
+  {
+    case "popularity":
+      sortField = "lookupBlob.userRating.ratingCount";
+    break;
+
+    case "rating":
+      sortField = "searchBlob.averageUserRating";
+    break;
+
+    case "release date":
+      sortField = "lookupBlob.releaseDate";
+    break;
+
+    case "name":
+      query = { trackName: { $regex: searchTermRegex } };
+      sortField = "trackName";
+      break;
+    default:
+
+    break;
+  }
+
   const options = {
     limit: count,
     skip: offset,
     sort: {
       [sortField] : -1,
-      // "lookupBlob.userRating.value": -1,
-      // "lookupBlob.releaseDate" : 1,
     },
   };
-
 
   const cursor = await mongo.collection.find(query, options);
   const results = [];

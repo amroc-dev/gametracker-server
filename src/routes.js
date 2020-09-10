@@ -13,6 +13,7 @@ router.post("/", async (req, res) => {
 
   const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
   const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
+  const sortField = bodyObj.sortField == undefined ? "lookupBlob.userRating.ratingCount" : bodyObj.sortField;
 
   const searchTerm = bodyObj.searchTerm.toLowerCase();
 
@@ -34,10 +35,12 @@ router.post("/", async (req, res) => {
     limit: count,
     skip: offset,
     sort: {
-      "lookupBlob.userRating.ratingCount": -1,
+      [sortField] : -1,
       // "lookupBlob.userRating.value": -1,
+      // "lookupBlob.releaseDate" : 1,
     },
   };
+
 
   const cursor = await mongo.collection.find(query, options);
   const results = [];

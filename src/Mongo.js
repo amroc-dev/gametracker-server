@@ -15,6 +15,7 @@ class Mongo {
       console.log("Connected to MongoDB");
       this.db = this.client.db("GameTracker");
       this.collection = this.db.collection("Games");
+      this.collection_meta = this.db.collection("Games_meta");
     } catch (err) {
       console.log(err);
     }

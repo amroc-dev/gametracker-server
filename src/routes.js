@@ -2,20 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const mongo = require("./Mongo");
+const gamesMeta = require("./GamesMeta")
 
-router.post("/", async (req, res) => {
-  const bodyObj = req.body;
-  if (bodyObj.searchTerm == undefined) {
-    console.log("invalid request: " + JSON.stringify(req.body));
-    res.send("Not ok");
-    return;
-  }
-
-  const searchTerm = bodyObj.searchTerm.toLowerCase();
-  console.log("SearchTerm: " + searchTerm);
-  const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
-  const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
-  const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
+async function doSearch(searchTerm, count, offset, sortMethod) {
 
   const searchTermRegex = new RegExp(searchTerm, "i");
   let query = {
@@ -27,6 +16,8 @@ router.post("/", async (req, res) => {
   };
 
   let sortField = "lookupBlob.userRating.ratingCount";
+  let sortDir = -1;
+
   switch (sortMethod.toLowerCase())
   {
     case "popularity":
@@ -44,9 +35,10 @@ router.post("/", async (req, res) => {
     case "name":
       query = { trackName: { $regex: searchTermRegex } };
       sortField = "trackName";
+      sortDir = 1;
       break;
-    default:
 
+    default:
     break;
   }
 
@@ -54,7 +46,7 @@ router.post("/", async (req, res) => {
     limit: count,
     skip: offset,
     sort: {
-      [sortField] : -1,
+      [sortField] : sortDir,
     },
   };
 
@@ -72,7 +64,42 @@ router.post("/", async (req, res) => {
     results,
   }
 
-  res.send(returnBlob);
+  return returnBlob
+}
+
+router.post("/", async (req, res) => {
+  const bodyObj = req.body;
+  if (bodyObj.requestType == undefined) {
+    console.log("invalid request: " + JSON.stringify(req.body));
+    res.send("Not ok");
+    return;
+  }
+
+  let dbData = null
+
+  switch (bodyObj.requestType)
+  {
+    case "search":
+      {
+        const searchTerm = bodyObj.searchTerm.toLowerCase();
+        const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
+        const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
+        const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
+        dbData = await doSearch(searchTerm, count, offset, sortMethod)
+      }
+      break;
+
+    case "tags":
+      {
+        dbData = [...gamesMeta.tags];
+      }
+
+    default: 
+    break;
+  }
+
+
+  res.send(dbData);
 });
 
 module.exports = router;

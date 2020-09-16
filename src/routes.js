@@ -3,17 +3,30 @@ const express = require("express");
 const router = express.Router();
 const mongo = require("./Mongo");
 const gamesMeta = require("./GamesMeta")
+const explain = require("./performance");
+const explain_find = require("./performance");
 
 async function doSearch(searchTerm, count, offset, sortMethod) {
 
-  const searchTermRegex = new RegExp(searchTerm, "i");
+  const searchTermRegex = new RegExp(searchTerm);
+  // let query = {
+  //   $or: [
+  //     { trackName: { $regex: searchTermRegex } },
+  //     { "searchBlob.sellerName": { $regex: searchTermRegex } },
+  //     // { tags: { $elemMatch: { $eq: searchTerm } } },
+  //   ],
+  // };
+
+  console.log("Search term: " + searchTerm)
+
   let query = {
     $or: [
-      { trackName: { $regex: searchTermRegex } },
-      { "searchBlob.sellerName": { $regex: searchTermRegex } },
+      { $text: { $search : searchTerm} },
       { tags: { $elemMatch: { $eq: searchTerm } } },
     ],
   };
+
+  // query = { tags: { $elemMatch: { $eq: searchTerm } } }
 
   let sortField = "lookupBlob.userRating.ratingCount";
   let sortDir = -1;
@@ -33,7 +46,6 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
     break;
 
     case "name":
-      query = { trackName: { $regex: searchTermRegex } };
       sortField = "trackName";
       sortDir = 1;
       break;
@@ -48,7 +60,10 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
     sort: {
       [sortField] : sortDir,
     },
+    // collation: { locale: 'en', strength: 1 } 
   };
+
+  // explain_find(query, options)
 
   const cursor = await mongo.collection.find(query, options);
   const results = [];
@@ -81,7 +96,7 @@ router.post("/", async (req, res) => {
   {
     case "search":
       {
-        const searchTerm = bodyObj.searchTerm.toLowerCase();
+        const searchTerm = bodyObj.searchTerm;
         const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
         const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
         const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;

@@ -8,7 +8,7 @@ const explain_find = require("./performance");
 
 async function doSearch(searchTerm, count, offset, sortMethod) {
 
-  const searchTermRegex = new RegExp(searchTerm);
+  // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
   //   $or: [
   //     { trackName: { $regex: searchTermRegex } },
@@ -19,14 +19,7 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
 
   console.log("Search term: " + searchTerm)
 
-  let query = {
-    $or: [
-      { $text: { $search : searchTerm} },
-      { tags: { $elemMatch: { $eq: searchTerm } } },
-    ],
-  };
-
-  // query = { tags: { $elemMatch: { $eq: searchTerm } } }
+  const query = searchTerm.length === 0 ? {} : {$text: { $search : searchTerm} }
 
   let sortField = "lookupBlob.userRating.ratingCount";
   let sortDir = -1;
@@ -57,10 +50,11 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
   const options = {
     limit: count,
     skip: offset,
+    // projection: { score: { "$meta": "textScore" } },
+    // sort: { score: { "$meta": "textScore" } }
     sort: {
       [sortField] : sortDir,
     },
-    // collation: { locale: 'en', strength: 1 } 
   };
 
   // explain_find(query, options)

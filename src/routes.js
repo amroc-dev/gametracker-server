@@ -6,7 +6,7 @@ const gamesMeta = require("./GamesMeta")
 const explain = require("./performance");
 const explain_find = require("./performance");
 
-async function doSearch(searchTerm, count, offset, sortMethod) {
+async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
 
   // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
@@ -17,9 +17,42 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
   //   ],
   // };
 
-  console.log("Search term: " + searchTerm)
+  const allQueries = []
 
-  const query = searchTerm.length === 0 ? {} : {$text: { $search : searchTerm} }
+  if (searchTerm.length > 0) {
+    const searchTermQuery = {$text: { $search : searchTerm} }
+    allQueries.push(searchTermQuery)
+  }
+
+  if (deviceFilter.length > 0) {
+    const deviceFilterQuery = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
+    allQueries.push(deviceFilterQuery)
+  }
+
+  let query = {}
+  if (allQueries.length == 1) {
+    query = allQueries[0]
+  }
+  else if (allQueries.length > 1) {
+    query = {
+      $and : allQueries
+    }
+  }
+
+
+
+  // const query = searchTerm.length === 0 ? {} : {$text: { $search : searchTerm} }
+
+  // const query = {
+  //   $and : [
+  //     {$text: { $search : searchTerm} },
+  //     { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
+  //   ]
+  // }
+
+  // const query = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
+
+
 
   let sortField = "lookupBlob.userRating.ratingCount";
   let sortDir = -1;
@@ -47,6 +80,10 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
     break;
   }
 
+  console.log("Request:")
+  console.log(" - Query: " + JSON.stringify(query))
+  console.log(" - Sort: " + sortField)
+
   const options = {
     limit: count,
     skip: offset,
@@ -57,7 +94,7 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
     },
   };
 
-  // explain_find(query, options)
+  explain_find(query, options)
 
   const cursor = await mongo.collection.find(query, options);
   const results = [];
@@ -75,6 +112,8 @@ async function doSearch(searchTerm, count, offset, sortMethod) {
 
   return returnBlob
 }
+
+////////////////////////////////////////////////////////////////////
 
 router.post("/", async (req, res) => {
   const bodyObj = req.body;
@@ -94,7 +133,8 @@ router.post("/", async (req, res) => {
         const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
         const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
         const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
-        dbData = await doSearch(searchTerm, count, offset, sortMethod)
+        const deviceFilter = bodyObj.deviceFilter == undefined ? [] : bodyObj.deviceFilter;
+        dbData = await doSearch(searchTerm, count, offset, sortMethod, deviceFilter)
       }
       break;
 

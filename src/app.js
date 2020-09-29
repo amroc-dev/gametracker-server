@@ -18,3 +18,12 @@ const boot = async () => {
 };
 
 boot();
+
+// const AppStorePricingMatrix = require("app-store-pricing-matrix");
+
+// const pricing = AppStorePricingMatrix.findBy({
+//   tier: "1",
+//   country: "FR"
+// });
+
+// console.log(AppStorePricingMatrix.tiers);     // => 0.99

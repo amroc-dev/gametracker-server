@@ -2,12 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const mongo = require("./Mongo");
-const gamesMeta = require("./GamesMeta")
+const gamesMeta = require("./GamesMeta");
 const explain = require("./performance");
 const explain_find = require("./performance");
+const dbkeys = require('../shared/db-keys')
 
 async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
-
   // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
   //   $or: [
@@ -17,29 +17,28 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
   //   ],
   // };
 
-  const allQueries = []
+  const allQueries = [];
 
   if (searchTerm.length > 0) {
-    const searchTermQuery = {$text: { $search : searchTerm} }
-    allQueries.push(searchTermQuery)
+    const searchTermQuery = { $text: { $search: searchTerm } };
+    allQueries.push(searchTermQuery);
   }
 
   if (deviceFilter.length > 0) {
-    const deviceFilterQuery = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
-    allQueries.push(deviceFilterQuery)
+    const deviceFilterQuery = {
+      "lookupBlob.deviceFamilies": { $all: deviceFilter },
+    };
+    allQueries.push(deviceFilterQuery);
   }
 
-  let query = {}
+  let query = {};
   if (allQueries.length == 1) {
-    query = allQueries[0]
-  }
-  else if (allQueries.length > 1) {
+    query = allQueries[0];
+  } else if (allQueries.length > 1) {
     query = {
-      $and : allQueries
-    }
+      $and: allQueries,
+    };
   }
-
-
 
   // const query = searchTerm.length === 0 ? {} : {$text: { $search : searchTerm} }
 
@@ -52,51 +51,55 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
 
   // const query = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
 
-
-
-  let sortField = "lookupBlob.userRating.ratingCount";
-  let sortDir = -1;
-
-  switch (sortMethod.toLowerCase())
-  {
-    case "popularity":
-      sortField = "lookupBlob.userRating.ratingCount";
-    break;
-
-    case "rating":
-      sortField = "searchBlob.averageUserRating";
-    break;
-
-    case "release date":
-      sortField = "lookupBlob.releaseDate";
-    break;
-
-    case "name":
-      sortField = "trackName";
-      sortDir = 1;
-      break;
-
-    default:
-    break;
-  }
-
-  console.log("Request:")
-  console.log(" - Query: " + JSON.stringify(query))
-  console.log(" - Sort: " + sortField)
-
-  const options = {
+  let sortOptions = {
     limit: count,
     skip: offset,
-    // projection: { score: { "$meta": "textScore" } },
-    // sort: { score: { "$meta": "textScore" } }
     sort: {
-      [sortField] : sortDir,
+      [dbkeys.popularity]: -1,
     },
   };
 
-  explain_find(query, options)
+  switch (sortMethod.toLowerCase()) {
+    case "popularity":
+      sortOptions.sort = { [dbkeys.popularity]: -1 };
+      break;
 
-  const cursor = await mongo.collection.find(query, options);
+    case "rating":
+      sortOptions.sort = { [dbkeys.rating]: -1, [dbkeys.popularity] : -1 };
+      break;
+
+    case "newest":
+      sortOptions.sort = { [dbkeys.releaseDate]: -1, [dbkeys.popularity]: -1 };
+      break;
+
+    case "oldest":
+      sortOptions.sort = { [dbkeys.releaseDate]: 1, [dbkeys.popularity]: -1 };
+      break;
+
+    case "price - lowest":
+      sortOptions.sort = { [dbkeys.price]: 1, [dbkeys.popularity]: -1 };
+      break;
+
+    case "price - highest":
+      sortOptions.sort = { [dbkeys.price]: -1, [dbkeys.popularity]: -1 };
+      break;
+
+    case "name":
+      sortOptions.sort = { [dbkeys.trackName]: 1 };
+      break;
+
+    default:
+      break;
+  }
+
+  console.log("Request:");
+  console.log(" - Query: " + JSON.stringify(query));
+  console.log(" - Sort: " + JSON.stringify(sortOptions.sort));
+
+  // explain_find(query, options)
+
+  const cursor = await mongo.collection.find(query, sortOptions);
+  // const test = cursor.explain("executionStats");
   const results = [];
   let resultsCount = 0;
 
@@ -108,9 +111,9 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
   const returnBlob = {
     resultsCount,
     results,
-  }
+  };
 
-  return returnBlob
+  return returnBlob;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -123,30 +126,36 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  let dbData = null
+  let dbData = null;
 
-  switch (bodyObj.requestType)
-  {
+  switch (bodyObj.requestType) {
     case "search":
       {
         const searchTerm = bodyObj.searchTerm;
         const count = bodyObj.count == undefined ? 20 : parseInt(bodyObj.count);
-        const offset = bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
-        const sortMethod = bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
-        const deviceFilter = bodyObj.deviceFilter == undefined ? [] : bodyObj.deviceFilter;
-        dbData = await doSearch(searchTerm, count, offset, sortMethod, deviceFilter)
+        const offset =
+          bodyObj.offset == undefined ? 20 : parseInt(bodyObj.offset);
+        const sortMethod =
+          bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
+        const deviceFilter =
+          bodyObj.deviceFilter == undefined ? [] : bodyObj.deviceFilter;
+        dbData = await doSearch(
+          searchTerm,
+          count,
+          offset,
+          sortMethod,
+          deviceFilter
+        );
       }
       break;
 
-    case "tags":
-      {
-        dbData = [...gamesMeta.tags];
-      }
+    case "tags": {
+      dbData = [...gamesMeta.tags];
+    }
 
-    default: 
-    break;
+    default:
+      break;
   }
-
 
   res.send(dbData);
 });

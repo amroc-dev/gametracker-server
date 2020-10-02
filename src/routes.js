@@ -64,7 +64,7 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
       sortOptions.sort = { [dbkeys.popularity]: -1 };
       break;
 
-    case "rating":
+    case "user rating":
       sortOptions.sort = { "metaRanking": -1 };
       break;
 

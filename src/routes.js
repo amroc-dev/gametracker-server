@@ -96,10 +96,9 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
   console.log(" - Query: " + JSON.stringify(query));
   console.log(" - Sort: " + JSON.stringify(sortOptions.sort));
 
-  explain_find(query, sortOptions)
+  // explain_find(query, sortOptions)
 
   const cursor = await mongo.collection.find(query, sortOptions);
-  // const test = cursor.explain("executionStats");
   const results = [];
   let resultsCount = 0;
 

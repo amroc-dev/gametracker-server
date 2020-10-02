@@ -13,14 +13,13 @@ async function explain_find(query, options) {
 
     } = explain.queryPlanner
 
-    console.log("Results:")
-    console.log( {
+    console.log("Explain results: " + JSON.stringify({
         parsedQuery,
         indexFilterSet,
         executionTimeMillis,
         totalKeysExamined,
         totalDocsExamined,
-    })
+    }))
 }
 
 module.exports = explain_find;

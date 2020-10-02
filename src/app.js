@@ -7,6 +7,7 @@ const gamesMeta = require ('./GamesMeta');
 const routes = require("./routes");
 
 const app = express();
+app.use(require('express-status-monitor')());
 app.use(bodyParser.json());
 app.use(cors());
 app.use("/", routes);
@@ -14,7 +15,7 @@ app.use("/", routes);
 const boot = async () => {
   await mongo.main();
   await gamesMeta.init();
-  app.listen(3001);
+  app.listen(process.env.PORT || 80);
 };
 
 boot();

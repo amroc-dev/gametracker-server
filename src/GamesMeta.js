@@ -17,7 +17,7 @@ class GamesMeta {
         }
 
         const result = await cursor.next();
-        this.tags = [...result.tags];
+        this.tags = [...result.tags]
 
       } catch (err) {
         console.log(err);

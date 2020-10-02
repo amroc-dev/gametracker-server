@@ -65,23 +65,23 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
       break;
 
     case "rating":
-      sortOptions.sort = { [dbkeys.rating]: -1, [dbkeys.popularity] : -1 };
+      sortOptions.sort = { "metaRanking": -1 };
       break;
 
     case "newest":
-      sortOptions.sort = { [dbkeys.releaseDate]: -1, [dbkeys.popularity]: -1 };
+      sortOptions.sort = { [dbkeys.releaseDate]: -1, "metaRanking": -1 };
       break;
 
     case "oldest":
-      sortOptions.sort = { [dbkeys.releaseDate]: 1, [dbkeys.popularity]: -1 };
+      sortOptions.sort = { [dbkeys.releaseDate]: 1, "metaRanking": -1 };
       break;
 
     case "price - lowest":
-      sortOptions.sort = { [dbkeys.price]: 1, [dbkeys.popularity]: -1 };
+      sortOptions.sort = { [dbkeys.price]: 1, "metaRanking": -1 };
       break;
 
     case "price - highest":
-      sortOptions.sort = { [dbkeys.price]: -1, [dbkeys.popularity]: -1 };
+      sortOptions.sort = { [dbkeys.price]: -1, "metaRanking": -1 };
       break;
 
     case "name":
@@ -96,7 +96,7 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
   console.log(" - Query: " + JSON.stringify(query));
   console.log(" - Sort: " + JSON.stringify(sortOptions.sort));
 
-  // explain_find(query, options)
+  explain_find(query, sortOptions)
 
   const cursor = await mongo.collection.find(query, sortOptions);
   // const test = cursor.explain("executionStats");

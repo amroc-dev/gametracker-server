@@ -19,7 +19,6 @@ async function getTags(arrayOut) {
       arrayOut.push(tag);
       return null;
     });
-    console.log(arrayOut)
   } catch (err) {
     console.log(err);
   }

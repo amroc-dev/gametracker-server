@@ -7,7 +7,7 @@ const explain = require("./performance");
 const explain_find = require("./performance");
 const dbkeys = require('../shared/db-keys')
 
-async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
+async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, popularityFilter) {
   // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
   //   $or: [
@@ -29,6 +29,13 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter) {
       "lookupBlob.deviceFamilies": { $all: deviceFilter },
     };
     allQueries.push(deviceFilterQuery);
+  }
+
+  if (popularityFilter > -1) {
+    const popularityFilterQuery = {
+      [dbkeys.popularity] : { $lte: popularityFilter },
+    }
+    allQueries.push(popularityFilterQuery);
   }
 
   let query = {};
@@ -138,12 +145,14 @@ router.post("/", async (req, res) => {
           bodyObj.sortMethod == undefined ? "Popularity" : bodyObj.sortMethod;
         const deviceFilter =
           bodyObj.deviceFilter == undefined ? [] : bodyObj.deviceFilter;
+        const popularityFilter = bodyObj.popularityFilter == undefined ? "-1" : bodyObj.popularityFilter
         dbData = await doSearch(
           searchTerm,
           count,
           offset,
           sortMethod,
-          deviceFilter
+          deviceFilter, 
+          popularityFilter,
         );
       }
       break;

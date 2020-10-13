@@ -165,6 +165,10 @@ router.post("/", async (req, res) => {
       break;
   }
 
+  if (dbData !== null && req.slowDown) {
+    dbData["rateData"] = req.slowDown
+  }
+
   res.send(dbData);
 });
 

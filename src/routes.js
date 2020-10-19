@@ -5,7 +5,8 @@ const mongo = require("./Mongo");
 const gamesMeta = require("./GamesMeta");
 const explain = require("./performance");
 const explain_find = require("./performance");
-const dbkeys = require('../shared/db-keys')
+const dbkeys = require('../shared/db-keys');
+const usageCounters = require("./usage");
 
 async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, popularityFilter) {
   // const searchTermRegex = new RegExp(searchTerm);
@@ -131,7 +132,7 @@ router.post("/", async (req, res) => {
     res.send("Not ok");
     return;
   }
-
+  
   let dbData = null;
 
   switch (bodyObj.requestType) {
@@ -170,6 +171,14 @@ router.post("/", async (req, res) => {
   }
 
   res.send(dbData);
+});
+
+router.get("/__status2", async (req, res) => {
+  let resultString = ""
+  for (key in usageCounters) {
+    resultString += ("<div>" + (key + ": " + usageCounters[key]) + "</div>")
+  }
+  res.send(resultString);
 });
 
 module.exports = router;

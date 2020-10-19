@@ -6,7 +6,10 @@ const mongo = require('./Mongo');
 const gamesMeta = require ('./GamesMeta');
 const routes = require("./routes");
 const slowDown = require("express-slow-down");
- 
+const expressSession = require('express-session');
+const expressVisitorCounter = require('express-visitor-counter');
+const usageCounters = require("./usage");
+
 const app = express();
 
 // speed limiter
@@ -20,7 +23,11 @@ const speedLimiter = slowDown({
 app.use(speedLimiter);
 
 // status monitor
-app.use(require('express-status-monitor')());
+app.use(require('express-status-monitor')( {path: '/__status'}));
+
+// visitor monitor
+app.use(expressSession({ secret: 'secret', resave: false, saveUninitialized: true }));
+app.use(expressVisitorCounter({ hook: counterId => usageCounters[counterId] = (usageCounters[counterId] || 0) + 1 }));
 
 // body parser
 app.use(bodyParser.json());

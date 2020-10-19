@@ -16,6 +16,7 @@ class Mongo {
       this.db = this.client.db("GameTracker");
       this.collection = this.db.collection("Games");
       this.collection_meta = this.db.collection("Games_meta");
+      this.collection_server = this.db.collection("Server");
     } catch (err) {
       console.log(err);
     }

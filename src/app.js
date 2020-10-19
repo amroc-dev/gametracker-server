@@ -7,7 +7,7 @@ const gamesMeta = require ('./GamesMeta');
 const routes = require("./routes");
 const slowDown = require("express-slow-down");
 const expressSession = require('express-session');
-const expressVisitorCounter = require('express-visitor-counter');
+const expressVisitorCounter = require('./visitor-counter');
 const usageCounters = require("./usage");
 
 const app = express();

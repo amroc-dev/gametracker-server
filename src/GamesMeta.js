@@ -1,10 +1,9 @@
 const mongo = require("./Mongo");
 const { setIntervalAsync } = require("set-interval-async/dynamic");
 
-async function getTags(arrayOut) {
+async function getArray(id, arrayOut) {
   try {
-    console.log("Retreiving latest tags metadata...");
-    let query = { _id: "tags" };
+    let query = { _id: id };
     const cursor = await mongo.collection_meta.find(query);
     const hasResult = await cursor.hasNext();
 
@@ -13,10 +12,9 @@ async function getTags(arrayOut) {
     }
 
     const result = await cursor.next();
-    console.log("Tags retrieved");
     arrayOut.length = 0;
-    result.tags.map((tag) => {
-      arrayOut.push(tag);
+    result[id].map((entry) => {
+      arrayOut.push(entry);
       return null;
     });
   } catch (err) {
@@ -27,12 +25,19 @@ async function getTags(arrayOut) {
 class GamesMeta {
   constructor() {
     this.tags = [];
+    this.popularityIntervals = []
+  }
+
+  async getData() {
+    await getArray("tags", this.tags);
+    await getArray("popularity_intervals", this.popularityIntervals);
   }
 
   async init() {
-    await getTags(this.tags);
-    const interval = 600000 // refresh every 10 mins
-    setIntervalAsync( getTags, interval, this.tags )
+    console.log("Retreiving latest metadata...");
+    await this.getData()
+    // const interval = 60 * (60 * 1000) // refresh every 60 minutes
+    // setIntervalAsync( this.getData, interval)
   }
 }
 

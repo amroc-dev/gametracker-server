@@ -18,6 +18,8 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
   //   ],
   // };
 
+  console.log("popFil: " + JSON.stringify(popularityFilter))
+
   const allQueries = [];
 
   if (searchTerm.length > 0) {
@@ -32,11 +34,12 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     allQueries.push(deviceFilterQuery);
   }
 
-  if (popularityFilter > -1) {
-    const popularityFilterQuery = {
-      [dbkeys.popularity] : { $lte: popularityFilter },
-    }
-    allQueries.push(popularityFilterQuery);
+  if (popularityFilter.min > -1 || popularityFilter.max > -1) {
+    const comparisonObj = {}
+    if (popularityFilter.min > -1) comparisonObj['$gte'] = popularityFilter.min
+    if (popularityFilter.max > -1) comparisonObj['$lte'] = popularityFilter.max
+    console.log(JSON.stringify(comparisonObj))
+    allQueries.push( {[dbkeys.popularity] : comparisonObj} );
   }
 
   let query = {};
@@ -161,6 +164,12 @@ router.post("/", async (req, res) => {
     case "tags": {
       dbData = [...gamesMeta.tags];
     }
+    break;
+
+    case "popularityIntervals": {
+      dbData = [...gamesMeta.popularityIntervals];
+    }
+    break;
 
     default:
       break;

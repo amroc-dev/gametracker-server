@@ -62,54 +62,41 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
 
   // const query = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
 
-  let options = {
+  let sortOptions = {
     limit: count,
     skip: offset,
     sort: {
       [dbkeys.popularity]: -1,
     },
-    projection: {
-      trackName: 1,
-      [dbkeys.trackId] : 1,
-      [dbkeys.artworkURL] : 1,
-      [dbkeys.popularity] : 1,
-      [dbkeys.rating] : 1,
-      [dbkeys.releaseDate] : 1,
-      [dbkeys.formattedPrice] : 1,
-      [dbkeys.price] : 1,
-      [dbkeys.trackName] : 1,
-      [dbkeys.tags] : 1,
-      [dbkeys.metaRanking] : 1,
-    }
   };
 
   switch (sortMethod.toLowerCase()) {
     case "popularity":
-      options.sort = { [dbkeys.popularity]: -1 };
+      sortOptions.sort = { [dbkeys.popularity]: -1 };
       break;
 
     case "user rating":
-      options.sort = { "metaRanking": -1 };
+      sortOptions.sort = { "metaRanking": -1 };
       break;
 
     case "newest":
-      options.sort = { [dbkeys.releaseDate]: -1, "metaRanking": -1 };
+      sortOptions.sort = { [dbkeys.releaseDate]: -1, "metaRanking": -1 };
       break;
 
     case "oldest":
-      options.sort = { [dbkeys.releaseDate]: 1, "metaRanking": -1 };
+      sortOptions.sort = { [dbkeys.releaseDate]: 1, "metaRanking": -1 };
       break;
 
     case "price - lowest":
-      options.sort = { [dbkeys.price]: 1, "metaRanking": -1 };
+      sortOptions.sort = { [dbkeys.price]: 1, "metaRanking": -1 };
       break;
 
     case "price - highest":
-      options.sort = { [dbkeys.price]: -1, "metaRanking": -1 };
+      sortOptions.sort = { [dbkeys.price]: -1, "metaRanking": -1 };
       break;
 
     case "name":
-      options.sort = { [dbkeys.trackName]: 1 };
+      sortOptions.sort = { [dbkeys.trackName]: 1 };
       break;
 
     default:
@@ -118,11 +105,11 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
 
   console.log("Request:");
   console.log(" - Query: " + JSON.stringify(query));
-  console.log(" - Sort: " + JSON.stringify(options.sort));
+  console.log(" - Sort: " + JSON.stringify(sortOptions.sort));
 
   // explain_find(query, sortOptions)
 
-  const cursor = await mongo.collection.find(query, options);
+  const cursor = await mongo.collection.find(query, sortOptions);
   const results = [];
   let resultsCount = 0;
 

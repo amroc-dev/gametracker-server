@@ -1,0 +1,10 @@
+{
+    "popularity" : "lookupBlob.userRating.ratingCount",
+    "rating" : "lookupBlob.userRating.value",
+    "releaseDate" : "lookupBlob.releaseDate",
+    "formattedPrice" : "searchBlob.formattedPrice",
+    "price" : "searchBlob.price",
+    "trackName" : "trackName",
+    "tags" : "tags",
+    "metaRanking" : "metaRanking"
+}

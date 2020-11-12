@@ -71,7 +71,7 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     projection: {
       trackName: 1,
       [dbkeys.trackId] : 1,
-      [dbkeys.artworkURL] : 1,
+      [dbkeys.artworkUrl] : 1,
       [dbkeys.popularity] : 1,
       [dbkeys.rating] : 1,
       [dbkeys.releaseDate] : 1,

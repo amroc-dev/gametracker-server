@@ -5,6 +5,9 @@
     "formattedPrice" : "searchBlob.formattedPrice",
     "price" : "searchBlob.price",
     "trackName" : "trackName",
+    "trackId" : "searchBlob.trackId",
+    "artistName" : "searchBlob.artistName",
+    "artworkUrl" : "searchBlob.artworkUrl512",
     "tags" : "tags",
     "metaRanking" : "metaRanking"
 }

@@ -77,7 +77,7 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
       [dbkeys.releaseDate] : 1,
       [dbkeys.formattedPrice] : 1,
       [dbkeys.price] : 1,
-      [dbkeys.trackName] : 1,
+      [dbkeys.artistName] : 1,
       [dbkeys.tags] : 1,
       [dbkeys.metaRanking] : 1,
     }

@@ -1,6 +1,6 @@
 {
     "popularity" : "lookupBlob.userRating.ratingCount",
-    "rating" : "lookupBlob.userRating.value",
+    "rating" : "searchBlob.averageUserRating",
     "releaseDate" : "lookupBlob.releaseDate",
     "formattedPrice" : "searchBlob.formattedPrice",
     "price" : "searchBlob.price",

@@ -8,7 +8,7 @@ const explain_find = require("./performance");
 const dbkeys = require('../shared/db-keys');
 const usageCounters = require("./usage");
 
-async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, popularityFilter) {
+async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, popularityFilter, ratingFilter) {
   // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
   //   $or: [
@@ -38,8 +38,11 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     const comparisonObj = {}
     if (popularityFilter.min > -1) comparisonObj['$gte'] = popularityFilter.min
     if (popularityFilter.max > -1) comparisonObj['$lte'] = popularityFilter.max
-    console.log(JSON.stringify(comparisonObj))
     allQueries.push( {[dbkeys.popularity] : comparisonObj} );
+  }
+
+  if (ratingFilter > -1) {
+    allQueries.push( {[dbkeys.rating] : {'$gte' : ratingFilter}} );
   }
 
   let query = {};
@@ -163,6 +166,7 @@ router.post("/", async (req, res) => {
         const deviceFilter =
           bodyObj.deviceFilter == undefined ? [] : bodyObj.deviceFilter;
         const popularityFilter = bodyObj.popularityFilter == undefined ? "-1" : bodyObj.popularityFilter
+        const ratingFilter = bodyObj.ratingFilter == undefined ? "-1" : bodyObj.ratingFilter 
         dbData = await doSearch(
           searchTerm,
           count,
@@ -170,6 +174,7 @@ router.post("/", async (req, res) => {
           sortMethod,
           deviceFilter, 
           popularityFilter,
+          ratingFilter,
         );
       }
       break;

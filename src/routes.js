@@ -83,6 +83,14 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
       [dbkeys.artistName] : 1,
       [dbkeys.tags] : 1,
       [dbkeys.metaRanking] : 1,
+
+      // 'searchBlob.averageUserRatingForCurrentVersion' : 1,
+      // 'searchBlob.userRatingCountForCurrentVersion' : 1,
+      // 'searchBlob.averageUserRating' : 1,
+      // 'lookupBlob.userRating.value' : 1,
+      // 'lookupBlob.userRating.ratingCount' : 1,
+      // 'lookupBlob.userRating.valueCurrentVersion' : 1,
+      // 'lookupBlob.userRating.ratingCountCurrentVersion' : 1,
     }
   };
 

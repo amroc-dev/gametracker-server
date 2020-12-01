@@ -44,7 +44,7 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
   }
 
   if (ratingFilter > -1) {
-    allQueries.push( {[dbkeys.rating] : {'$gte' : ratingFilter}} );
+    allQueries.push( {[dbkeys.ratingCurrentVersion] : {'$gte' : ratingFilter}} );
   }
 
   let query = {};

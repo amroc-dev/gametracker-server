@@ -8,6 +8,8 @@ const explain_find = require("./performance");
 const dbkeys = require('../shared/db-keys');
 const usageCounters = require("./usage");
 
+let searchProjectedFields = null
+
 async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, popularityFilter, ratingFilter) {
   // const searchTermRegex = new RegExp(searchTerm);
   // let query = {
@@ -65,33 +67,19 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
 
   // const query = { "lookupBlob.deviceFamilies": { $all: deviceFilter } }
 
+  // use project to only retreive the fields specified in dbkeys
+  if (searchProjectedFields === null) {
+    searchProjectedFields = {}
+    Object.values(dbkeys).forEach( val => searchProjectedFields[val] = 1)
+  }
+
   let options = {
     limit: count,
     skip: offset,
     sort: {
       [dbkeys.popularity]: -1,
     },
-    projection: {
-      [dbkeys.trackName]: 1,
-      [dbkeys.trackId] : 1,
-      [dbkeys.artworkUrl] : 1,
-      [dbkeys.popularity] : 1,
-      [dbkeys.rating] : 1,
-      [dbkeys.releaseDate] : 1,
-      [dbkeys.formattedPrice] : 1,
-      [dbkeys.price] : 1,
-      [dbkeys.artistName] : 1,
-      [dbkeys.tags] : 1,
-      [dbkeys.metaRanking] : 1,
-
-      // 'searchBlob.averageUserRatingForCurrentVersion' : 1,
-      // 'searchBlob.userRatingCountForCurrentVersion' : 1,
-      // 'searchBlob.averageUserRating' : 1,
-      // 'lookupBlob.userRating.value' : 1,
-      // 'lookupBlob.userRating.ratingCount' : 1,
-      // 'lookupBlob.userRating.valueCurrentVersion' : 1,
-      // 'lookupBlob.userRating.ratingCountCurrentVersion' : 1,
-    }
+    projection: searchProjectedFields,
   };
 
   switch (sortMethod.toLowerCase()) {

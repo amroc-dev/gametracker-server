@@ -36,11 +36,9 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     allQueries.push(deviceFilterQuery);
   }
 
-  if (popularityFilter.min > -1 || popularityFilter.max > -1) {
-    const comparisonObj = {}
-    if (popularityFilter.min > -1) comparisonObj['$gte'] = popularityFilter.min
-    if (popularityFilter.max > -1) comparisonObj['$lte'] = popularityFilter.max
-    allQueries.push( {[dbkeys.popularity] : comparisonObj} );
+  if (popularityFilter.value > -1) {
+    const direction = popularityFilter.ascending ? '$gte' : '$lte'
+    allQueries.push( {[dbkeys.popularity] : {[direction] : popularityFilter.value}} );
   }
 
   if (ratingFilter > -1) {

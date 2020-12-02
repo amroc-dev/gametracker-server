@@ -36,9 +36,9 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     allQueries.push(deviceFilterQuery);
   }
 
-  if (popularityFilter.value > 0) {
+  if (popularityFilter.ratingCount > 0) {
     const direction = popularityFilter.ascending ? '$gte' : '$lte'
-    allQueries.push( {[dbkeys.popularity] : {[direction] : popularityFilter.value}} );
+    allQueries.push( {[dbkeys.popularity] : {[direction] : popularityFilter.ratingCount}} );
   }
 
   if (ratingFilter > -1) {

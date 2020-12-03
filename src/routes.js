@@ -179,15 +179,13 @@ router.post("/", async (req, res) => {
       }
       break;
 
-    case "tags": {
-      dbData = [...gamesMeta.tags];
+    case "games_meta": {
+      dbData = {
+        "tags" : [...gamesMeta.tags],
+        "popularityIntervals": [...gamesMeta.popularityIntervals],
+        "releaseYears" : [...gamesMeta.releaseYears]
+      }
     }
-    break;
-
-    case "popularityIntervals": {
-      dbData = [...gamesMeta.popularityIntervals];
-    }
-    break;
 
     default:
       break;

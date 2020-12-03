@@ -26,11 +26,13 @@ class GamesMeta {
   constructor() {
     this.tags = [];
     this.popularityIntervals = []
+    this.releaseYears = []
   }
 
   async getData() {
     await getArray("tags", this.tags);
     await getArray("popularity_intervals", this.popularityIntervals);
+    await getArray("releaseYears", this.releaseYears);
   }
 
   async init() {

@@ -36,10 +36,16 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
     allQueries.push(deviceFilterQuery);
   }
 
-  if (popularityFilter.ratingCount > 0) {
-    const direction = popularityFilter.ascending ? '$gte' : '$lte'
-    allQueries.push( {[dbkeys.popularity] : {[direction] : popularityFilter.ratingCount}} );
+  if (popularityFilter.min > -1 || popularityFilter.max > -1) {
+    const comparisonObj = {}
+    if (popularityFilter.min > -1) comparisonObj['$gte'] = popularityFilter.min
+    if (popularityFilter.max > -1) comparisonObj['$lte'] = popularityFilter.max
+    allQueries.push( {[dbkeys.popularity] : comparisonObj} );
   }
+  // if (popularityFilter.ratingCount > 0) {
+  //   const direction = popularityFilter.ascending ? '$gte' : '$lte'
+  //   allQueries.push( {[dbkeys.popularity] : {[direction] : popularityFilter.ratingCount}} );
+  // }
 
   if (ratingFilter > -1) {
     allQueries.push( {[dbkeys.ratingCurrentVersion] : {'$gte' : ratingFilter}} );

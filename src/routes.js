@@ -95,21 +95,21 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
       options.sort = { "metaRanking": -1 };
       break;
 
-    case "newest":
+    case "release date":
       options.sort = { [dbkeys.releaseDate]: -1, "metaRanking": -1 };
       break;
 
-    case "oldest":
-      options.sort = { [dbkeys.releaseDate]: 1, "metaRanking": -1 };
-      break;
+    // case "oldest":
+    //   options.sort = { [dbkeys.releaseDate]: 1, "metaRanking": -1 };
+    //   break;
 
-    case "price - lowest":
-      options.sort = { [dbkeys.price]: 1, "metaRanking": -1 };
-      break;
+    // case "price - lowest":
+    //   options.sort = { [dbkeys.price]: 1, "metaRanking": -1 };
+    //   break;
 
-    case "price - highest":
-      options.sort = { [dbkeys.price]: -1, "metaRanking": -1 };
-      break;
+    // case "price - highest":
+    //   options.sort = { [dbkeys.price]: -1, "metaRanking": -1 };
+    //   break;
 
     case "name":
       options.sort = { [dbkeys.trackName]: 1 };

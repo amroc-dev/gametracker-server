@@ -115,6 +115,10 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
       options.sort = { [dbkeys.trackName]: 1 };
       break;
 
+    case "recently updated":
+      options.sort = { [dbkeys.currentVersionReleaseDate]: -1 };
+      break;
+
     default:
       break;
   }

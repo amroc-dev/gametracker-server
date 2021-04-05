@@ -1,6 +1,5 @@
 require("dotenv").config();
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongo = require("./Mongo");
 const gamesMeta = require("./GamesMeta");
@@ -46,8 +45,8 @@ app.use(
   })
 );
 
-// body parser
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // cors
 app.use(cors());
@@ -59,6 +58,7 @@ const boot = async () => {
   await mongo.main();
   await gamesMeta.init();
   app.listen(process.env.PORT || 80);
+  console.log("Server started")
 };
 
 boot();

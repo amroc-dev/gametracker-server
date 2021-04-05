@@ -149,7 +149,10 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
 ////////////////////////////////////////////////////////////////////
 
 router.post("/", async (req, res) => {
+
   const bodyObj = req.body;
+//   console.log('bodyObj: ' + bodyObj)
+
   if (bodyObj.requestType == undefined) {
     console.log("invalid request: " + JSON.stringify(req.body));
     res.send("Not ok");
@@ -201,6 +204,16 @@ router.post("/", async (req, res) => {
 
   res.send(dbData);
 });
+
+
+// // apple sign in auth
+// ////////////////////////////////////////////////////////////////////
+// router.post("/auth", async (req, res) => {
+  
+//   console.log("Body: " + JSON.stringify(req.body, null, 4))
+//   const { authorization, user } = req.body;
+//   console.log("MM: auth: " + authorization + ", user: " + user)
+// });
 
 router.get("/__status2", async (req, res) => {
   let resultString = ""

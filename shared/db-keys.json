@@ -11,5 +11,6 @@
     "artistName" : "searchBlob.artistName",
     "artworkUrl" : "searchBlob.artworkUrl512",
     "tags" : "tags",
-    "metaRanking" : "metaRanking"
+    "metaRanking" : "metaRanking",
+    "screenshotUrls" : "searchBlob.screenshotUrls"
 }

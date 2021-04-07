@@ -45,7 +45,7 @@ app.use(
   })
 );
 
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // cors

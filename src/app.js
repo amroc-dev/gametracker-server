@@ -23,7 +23,7 @@ const speedLimiter = slowDown({
 app.use(speedLimiter);
 
 // status monitor
-app.use(require("express-status-monitor")({ path: "/__status" }));
+app.use(require("express-status-monitor")({ path: "/___status" }));
 
 app.use(
   expressSession({

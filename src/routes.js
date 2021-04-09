@@ -215,7 +215,7 @@ router.post("/", async (req, res) => {
 //   console.log("MM: auth: " + authorization + ", user: " + user)
 // });
 
-router.get("/__status2", async (req, res) => {
+router.get("/___status2", async (req, res) => {
   let resultString = ""
   for (key in usageCounters) {
     resultString += ("<div>" + (key + ": " + usageCounters[key]) + "</div>")

@@ -20,8 +20,6 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
   //   ],
   // };
 
-  console.log("popFil: " + JSON.stringify(popularityFilter))
-
   const allQueries = [];
 
   if (searchTerm.length > 0) {
@@ -123,9 +121,9 @@ async function doSearch(searchTerm, count, offset, sortMethod, deviceFilter, pop
       break;
   }
 
-  console.log("Request:");
-  console.log(" - Query: " + JSON.stringify(query));
-  console.log(" - Sort: " + JSON.stringify(options.sort));
+//   console.log("Request:");
+//   console.log(" - Query: " + JSON.stringify(query));
+//   console.log(" - Sort: " + JSON.stringify(options.sort));
 
   // explain_find(query, sortOptions)
 

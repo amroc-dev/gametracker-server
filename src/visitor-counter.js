@@ -23,56 +23,71 @@ module.exports = (config = {}) => {
 
   return (req, res, next) => {
 
+    if (req.originalUrl && req.originalUrl.toLowerCase().endsWith('status2')) {
+        next()
+        return;
+    }
+
     // determine the today date
     const todayDate = dateFormat(new Date(), "dd-mm-yyyy");
-    // console.log("Req: " + req)
 
-    // determine the counter prefix
-    const counterPrefix = "";//config.prefix || req.hostname;
+    // // determine the counter prefix
+    // const counterPrefix = "";//config.prefix || req.hostname;
 
     // increment the counter of requests
-    incCounter(`${counterPrefix}Requests-${todayDate}`);
-
-    // check if the express-session middleware is enabled
-    if (req.session === undefined) return next();
-
-    // if this session is already in memory, we retrieve it to get the last updates
-    if (sessions[req.session.id]) req.session = sessions[req.session.id];
+    incCounter(`reqs ${todayDate}`);
 
     // create a list for the current day to store IP addresses
     if (!ipAddresses[todayDate]) ipAddresses[todayDate] = {};
 
-    // "notFirstVisit" is used because when multiple requests come at the same time from the same web client, they are not identified with the same session id
-    // the last visit date is set only after the second wave of requests when the cookie has been initialized client-side
-    let withSession = false;
-    if (req.session.notFirstVisit && req.session.lastVisitDate !== todayDate) {
-      // set the last visit date for this visitor
-      req.session.lastVisitDate = todayDate;
-
-      // set the "withSession" boolean to true to avoid incrementing the visitor counter for the same IP with a different cookie
-      withSession = true;
-
-      // check if this visitor is not came today with the same IP but a different cookie
-      if (
-        !ipAddresses[todayDate][req.ip] ||
-        !ipAddresses[todayDate][req.ip].withSession
-      )
-        incCounter(`${counterPrefix}Visitors-${todayDate}`);
-    }
-    req.session.notFirstVisit = true;
-
-    // save the session into memory
-    sessions[req.session.id] = req.session;
-
-    // check if this IP address is new today
     if (!ipAddresses[todayDate][req.ip]) {
-      ipAddresses[todayDate][req.ip] = { requests: 1, withSession };
-      incCounter(`${counterPrefix}IP addresses-${todayDate}`);
-    } else {
-      ipAddresses[todayDate][req.ip].requests++;
-      ipAddresses[todayDate][req.ip].withSession =
-        withSession || ipAddresses[todayDate][req.ip].withSession;
-    }
+        ipAddresses[todayDate][req.ip] = { requests: 1 };
+        incCounter(`ips ${todayDate}`);
+      } else {
+        ipAddresses[todayDate][req.ip].requests++;
+      }
+
+
+    // // check if the express-session middleware is enabled
+    // if (req.session === undefined) return next();
+
+    // // if this session is already in memory, we retrieve it to get the last updates
+    // if (sessions[req.session.id]) req.session = sessions[req.session.id];
+
+
+
+
+    // // "notFirstVisit" is used because when multiple requests come at the same time from the same web client, they are not identified with the same session id
+    // // the last visit date is set only after the second wave of requests when the cookie has been initialized client-side
+    // let withSession = false;
+    // if (req.session.notFirstVisit && req.session.lastVisitDate !== todayDate) {
+    //   // set the last visit date for this visitor
+    //   req.session.lastVisitDate = todayDate;
+
+    //   // set the "withSession" boolean to true to avoid incrementing the visitor counter for the same IP with a different cookie
+    //   withSession = true;
+
+    //   // check if this visitor is not came today with the same IP but a different cookie
+    //   if (
+    //     !ipAddresses[todayDate][req.ip] ||
+    //     !ipAddresses[todayDate][req.ip].withSession
+    //   )
+    //     incCounter(`${counterPrefix}Visitors-${todayDate}`);
+    // }
+    // req.session.notFirstVisit = true;
+
+    // // save the session into memory
+    // sessions[req.session.id] = req.session;
+
+    // // check if this IP address is new today
+    // if (!ipAddresses[todayDate][req.ip]) {
+    //   ipAddresses[todayDate][req.ip] = { requests: 1, withSession };
+    //   incCounter(`${counterPrefix}IP addresses-${todayDate}`);
+    // } else {
+    //   ipAddresses[todayDate][req.ip].requests++;
+    //   ipAddresses[todayDate][req.ip].withSession =
+    //     withSession || ipAddresses[todayDate][req.ip].withSession;
+    // }
     next();
   };
 };
